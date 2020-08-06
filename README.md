@@ -1,6 +1,6 @@
 # Healthcare Supply Chain using Blockchain
 
-Test-server http://35.246.107.139 :red_circle: (offline)
+Test-server http://130.63.202.67 :red_circle: (offline)
 
 ### Overview ###
 
@@ -9,10 +9,10 @@ This Project is a feasibility study to explore how an healthcare supply-chain ca
 This project uses the hyperledger fabric blockchain together with the hyperledger composer tool. 
 
 Here is an architecture overview: 
-![architecture overview](https://github.com/basic-architecture.png)
+![architecture overview](https://github.com/AzharMithani/Healthcare-Supply-Chain-using-Blockchain/blob/master/basic-architecture.png)
 
 Here is an uml diagram: 
-![uml diagram](https://github.com/uml_diagram.png)
+![uml diagram](https://github.com/AzharMithani/Healthcare-Supply-Chain-using-Blockchain/blob/master/uml_diagram.png)
 
 
 ## Blockchain Sender
