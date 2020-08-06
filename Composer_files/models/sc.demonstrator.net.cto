@@ -1,0 +1,207 @@
+
+namespace sc.demonstrator.net
+
+asset Company identified by companyId {
+    o String companyId
+    o String name
+    o Double lat  //latitude
+    o Double long //longitude
+}
+
+abstract asset Product identified by productId {
+    o String productId
+    --> Company company
+    //--> Product[] parts
+}
+
+asset Car extends Product {
+    o CarStatus status default="ASSEMBLY"
+    --> Holder holder
+    --> Roof roof optional
+    --> Shell shell optional
+    o QAReport[] qAReport optional
+    o TransportReport[] transportReport optional
+}
+
+asset Roof extends Product {
+    o ProductStatus status default="ONSTOCK"
+}
+
+asset Shell extends Product {
+    o ProductStatus status default="ONSTOCK"
+}
+
+concept QAReport {
+    o Boolean lightCheck default=false
+    o Boolean hornCheck default=false
+    o Holder issuer optional
+    o FileObj file optional
+}
+
+concept TransportReport {
+    o String routeHash optional
+    o Measurement[] tilted optional
+    o Measurement[] humidity optional
+    o Measurement[] temperature optional
+    o String vehicle optional
+    o Holder issuer optional
+    o FileObj file optional
+}
+  
+concept Measurement {
+    o Double lat
+    o Double long
+	o Double measuredValue
+}
+
+concept FileObj {
+    o String fileId
+    o String fileHash
+}
+
+enum CarStatus {
+    o ASSEMBLY
+    o QA
+    o READYFORTRANSPORT
+    o TRANSPORT
+    o ARRIVED
+    o FORSALE
+    o SOLD
+}
+
+enum ProductStatus {
+    o ONSTOCK
+    o MOUNTED
+}
+
+//HACK When referencing participants be as explicit as possible.
+//E.g.: Assembly_holder instead of Holder
+abstract participant User identified by uID {
+    o String uID
+}
+
+participant Customer extends User {
+}
+
+abstract participant Holder extends User {
+    --> Company company
+}
+
+participant Assembly_holder extends Holder {
+    o Double lat
+    o Double long
+}
+
+participant QA_holder extends Holder {
+    o Double lat
+    o Double long
+}
+
+participant Transport_holder extends Holder {
+}
+
+participant Distribution_holder extends Holder {
+    o Double lat
+    o Double long
+}
+
+/*
+transaction AlterInformation {
+  --> User user
+  o String email
+}*/
+
+/*
+Super Class for every UserInteraction
+*/
+abstract transaction UserInteraction {
+  --> Car car
+  //Issuer can be used to
+  //A. Identify owner
+  //B. Identy holder (especially Transport and QA Holder)
+  --> Holder issuer
+}
+
+abstract transaction ProductCreation {
+  o String productId
+  --> Holder issuer
+}
+
+transaction ShellArrival extends ProductCreation {
+  --> Company company
+}
+
+transaction RoofArrival extends ProductCreation {
+  --> Company company
+}
+
+/*
+Creates Car, sets CarId
+*/
+transaction CreateCar extends ProductCreation {
+  --> Shell shell
+  // CarStatus = ASSEMBLY
+  // Company company (wird durch issuer bestimmt)
+  // Participant holder (wird durch issuer bestimmt)
+  // R, S, Q, T
+}
+
+/*
+Assemble Car and add Roof, Shell
+*/
+transaction Assembly extends UserInteraction {
+  --> Roof roof
+}
+
+transaction QACheck extends UserInteraction {
+  o Boolean lightCheck
+  o Boolean hornCheck
+}
+
+transaction ReadyForTransport extends UserInteraction {
+}
+
+transaction TransportStart extends UserInteraction {
+}
+
+transaction TiltedStatusUpdate extends UserInteraction {
+    o Double lat
+    o Double long
+    o Double measuredValue
+}
+  
+transaction HumidityStatusUpdate extends UserInteraction {
+    o Double lat
+    o Double long
+    o Double measuredValue
+}
+  
+transaction TemperatureStatusUpdate extends UserInteraction {
+    o Double lat
+    o Double long
+    o Double measuredValue
+}
+  
+
+transaction TransportStop extends UserInteraction {
+  // CarStatus status = ARRIVED
+}
+
+transaction TakeOverFromTransport extends UserInteraction {
+  // TODO Participant holder = Distribution_holder
+  // CarStatus status = FORSALE
+}
+
+transaction Sold extends UserInteraction {
+  // Participant holder = CustomerXY
+  // CarStatus status = SOLD
+}
+
+transaction Setup {
+
+}
+
+/*
+event RequestProcessedEvent {
+    o String authId
+}*/
